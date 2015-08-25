@@ -1,11 +1,11 @@
 <?php
 $messages = json_decode($HTTP_RAW_POST_DATA);
-
 $zd_subdomain = getenv('ZENDESK_SUBDOMAIN');
 $zd_username = getenv('ZENDESK_USERNAME');
 $zd_api_token = getenv('ZENDESK_API_TOKEN');
 $debug = getenv('DEBUG_ENABLED');
 $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
+
 error_log("Post data".$_POST["channel_name"]);
 if ($messages) {
   $channel_name = $_POST["channel_name"];
@@ -14,6 +14,7 @@ if ($messages) {
   $text = $_POST["text"];
   $token = $_POST["token"];
   $trigger_type = $_POST["trigger_word"];
+  error_log("message recieved from slack: channel=".$channel_name ."username=".$requester_name." message=".$text);
   if ($debug == "true"){
      error_log("message recieved from slack: channel=".$channel_name ."username=".$requester_name." message=".$text);
   }
