@@ -1,13 +1,10 @@
 <?php
-$messages = json_decode($HTTP_RAW_POST_DATA);
 $zd_subdomain = getenv('ZENDESK_SUBDOMAIN');
 $zd_username = getenv('ZENDESK_USERNAME');
 $zd_api_token = getenv('ZENDESK_API_TOKEN');
 $debug = getenv('DEBUG_ENABLED');
 $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
 
-error_log("Post data".$_POST["channel_name"]);
-if ($messages) {
   $channel_name = $_POST["channel_name"];
   $user_id = $_POST["user_id"];
   $requester_name = $_POST["user_name"];
@@ -54,7 +51,6 @@ if ($messages) {
     default:
       continue 2;
   }
-}
 function http_request($url, $data_json, $method, $auth_type, $username, $token) {
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
