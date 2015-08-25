@@ -35,8 +35,8 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
       break;
     case "@approved":
       $verb = "acknowledged ";
-      $ticket_id = explode("@approved ",$text);
-      $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets/$ticket_id.json";
+      $content = explode("@approved ",$text);
+      $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets/$content[1].json";
       $data = array('ticket'=>array('comment'=>array('public'=>'false','body'=>"Approved by $requester_name")));
       $data_json = json_encode($data);
       $status_code = http_request($url, $data_json, "PUT", "basic", $zd_username, $zd_api_token);
