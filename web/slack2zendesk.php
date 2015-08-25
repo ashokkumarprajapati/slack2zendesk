@@ -4,18 +4,22 @@ $messages = json_decode($HTTP_RAW_POST_DATA);
 $zd_subdomain = getenv('ZENDESK_SUBDOMAIN');
 $zd_username = getenv('ZENDESK_USERNAME');
 $zd_api_token = getenv('ZENDESK_API_TOKEN');
-$pd_subdomain = getenv('PAGERDUTY_SUBDOMAIN');
-$pd_api_token = getenv('PAGERDUTY_API_TOKEN');
 $debug = getenv('DEBUG_ENABLED');
+$slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
 
 if ($messages) {
   $channel_name = $messages->channel_name;
   $user_id = $messages->user_id;
   $requester_name = $messages->user_name;
   $text = $messages->text;
+  $token = $messages->token;
   $trigger_type = $messages->trigger_word;
   if ($debug == "true"){
      error_log("message recieved from slack: channel=".$channel_name ."username=".$requester_name." message=".$text);
+  }
+  if ($slack_token != $token){
+     error_log("This invalid request as it doesn't have correct token.");
+     return 200;
   }
   switch ($trigger_type) {
     case "@change":
@@ -23,12 +27,11 @@ if ($messages) {
       //Remove the pd_integration tag in Zendesk to eliminate further updates
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
       $title = strstr($text,"@change");
-      $data = array('ticket' => array( 
- 		 'group\_id' => 24712511,    
- 		 'subject' => "Change :".$text,  
- 		 'comment' => $text . "\n\n Created on behalf of:".  
- 		)  
-            );
+      //$data = array('ticket' => array( 
+ 		  //             'group\_id' => 24712511,    
+ 		  //             'subject' => "Change :".$text,  
+ 		  //            'comment' => $text . "\n\n Created on behalf of:".$requester_name) 
+ 		  //        );
       $data_json = json_encode($data);
       $status_code = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
       break;
