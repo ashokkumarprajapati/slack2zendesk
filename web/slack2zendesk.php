@@ -6,6 +6,7 @@ $zd_username = getenv('ZENDESK_USERNAME');
 $zd_api_token = getenv('ZENDESK_API_TOKEN');
 $debug = getenv('DEBUG_ENABLED');
 $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
+error_log($messages);
 
 if ($messages) {
   $channel_name = $messages->channel_name;
