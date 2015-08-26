@@ -24,7 +24,7 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
       $response = "";
       //Remove the pd_integration tag in Zendesk to eliminate further updates
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
-      $title = strstr($text,"@change");
+      $title = explode("@change ",$text);
       $data = array('ticket' => array( 
  		              'group_id' => 24712511,    
  		              'subject' => "Change :".$text,  
