@@ -21,33 +21,30 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
   }
   switch ($trigger_type) {
     case "@change":
-      $response = "";
-      //Remove the pd_integration tag in Zendesk to eliminate further updates
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
-      $title = explode("@change ",$text);
+      $title = explode("@change ",$text)[1];
       $data = array('ticket' => array( 
  		              'group_id' => 24712511,    
- 		              'subject' => "Change :".$text,  
+ 		              'subject' => "Change :".$title,  
  		              'comment' => $text . "\n\n Created on behalf of:".$requester_name,
                    'fields' => array('27504901' => "pending_approval")
                   ) 
  		          );
       $data_json = json_encode($data);
-      $status_code = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token,$response);
-      error_log($response);
-      $slack_response = array('text' => "Zendesk ticket has been created for this change and sent for approval to CAB.");
+      list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
+      $ticket_id = json_decode($response)->ticket->id;
+      $slack_response = array('text' => "Zendesk ticket#.$ticket_id has been created for this change and sent for approval to CAB. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/.$ticket_id");
       echo  json_encode($slack_response);
       break;
     case "@approved":
-      $response = "";
       $content = explode("@approved ",$text);
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets/$content[1].json";
       $data = array('ticket'=>array('comment'=>array('public'=>'false','body'=>"Approved by $requester_name"),'fields' => array('27504901' => "approved")));
       $data_json = json_encode($data);
-      $status_code = http_request($url, $data_json, "PUT", "basic", $zd_username, $zd_api_token,$response);
+      list($status_code,$response) = http_request($url, $data_json, "PUT", "basic", $zd_username, $zd_api_token);
       if ($status_code != "200") {
       	  //error_log("Error while trying to approve ticket in zendesk");
-          $slack_response = array('text' => "Could not create ticket in zendesk. Please check syntax. It should be like @approved <Ticket Number>}");
+          $slack_response = array('text' => "Could not approve ticket in zendesk. Please check ticket number. It should be like @approved <Ticket Number>}");
           echo json_encode($slack_response);
           error_log($response);
           break;
@@ -60,7 +57,7 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
     default:
       continue 2;
   }
-function http_request($url, $data_json, $method, $auth_type, $username, $token,$response) {
+function http_request($url, $data_json, $method, $auth_type, $username, $token) {
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
   if ($auth_type == "token") {
@@ -77,9 +74,9 @@ function http_request($url, $data_json, $method, $auth_type, $username, $token,$
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   //curl_setopt($ch, CURLOPT_VERBOSE, true);
   $response  = curl_exec($ch);
-  error_log($response);
+  //error_log($response);
   $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
   curl_close($ch);
-  return $status_code;
+  return array($status_code,$response );
 }
 ?>
