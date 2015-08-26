@@ -34,8 +34,9 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
  		          );
       $data_json = json_encode($data);
       $status_code = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token,$response);
-     
-      echo  json_encode("{'text':'Zendesk ticket has been created for this change and sent for approval to CAB.'}");
+      error_log($response);
+      $slack_response = array('text' => "Zendesk ticket has been created for this change and sent for approval to CAB.");
+      echo  json_encode($slack_response);
       break;
     case "@approved":
       $response = "";
@@ -46,11 +47,13 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
       $status_code = http_request($url, $data_json, "PUT", "basic", $zd_username, $zd_api_token,$response);
       if ($status_code != "200") {
       	  //error_log("Error while trying to approve ticket in zendesk");
-          echo json_encode("{'text':'Could not create ticket in zendesk. Please check syntax. It should be like @approved <Ticket Number>}'");
+          $slack_response = array('text' => "Could not create ticket in zendesk. Please check syntax. It should be like @approved <Ticket Number>}");
+          echo json_encode($slack_response);
+          error_log($response);
           break;
 	    } 
-      
-      echo json_encode("{'text':'Thanks for your approval. Zendesk Ticket#$content[1] has been approved and sent to DevOps for futher work.'}");
+      $slack_response = array('text' => "Thanks for your approval. Zendesk Ticket#$content[1] has been approved and sent to DevOps for futher work.");
+      echo json_encode($slack_response);
       break;
     case "@ticket":
       break;
@@ -74,6 +77,7 @@ function http_request($url, $data_json, $method, $auth_type, $username, $token,$
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   //curl_setopt($ch, CURLOPT_VERBOSE, true);
   $response  = curl_exec($ch);
+  error_log($response);
   $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
   curl_close($ch);
   return $status_code;
