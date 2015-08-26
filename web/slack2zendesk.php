@@ -32,7 +32,7 @@ switch ($trigger_type) {
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
       $ticket_id = json_decode($response)->ticket->id;
-      $slack_response = array('text' => "Zendesk ticket#.$ticket_id has been created for this change and sent for approval to CAB. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/.$ticket_id");
+      $slack_response = array('text' => "Zendesk ticket#$ticket_id has been created for this change and sent for approval to CAB. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/.$ticket_id");
       echo  json_encode($slack_response);
       break;
     case "@approved":
