@@ -26,7 +26,7 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
       $title = strstr($text,"@change");
       $data = array('ticket' => array( 
- 		              'group\_id' => 24712511,    
+ 		              'group_id' => 24712511,    
  		              'subject' => "Change :".$text,  
  		              'comment' => $text . "\n\n Created on behalf of:".$requester_name,
                    'fields' => array('27504901' => "pending_approval")
@@ -40,7 +40,7 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
       $response = "";
       $content = explode("@approved ",$text);
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets/$content[1].json";
-      $data = array('ticket'=>array('comment'=>array('public'=>'false','body'=>"Approved by $requester_name")));
+      $data = array('ticket'=>array('comment'=>array('public'=>'false','body'=>"Approved by $requester_name"),'fields' => array('27504901' => "approved")));
       $data_json = json_encode($data);
       $status_code = http_request($url, $data_json, "PUT", "basic", $zd_username, $zd_api_token,$response);
       if ($status_code != "200") {
