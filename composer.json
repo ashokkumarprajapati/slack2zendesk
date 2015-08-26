@@ -1,6 +1,5 @@
 {
   "require" : {
-  	"jakeasmith/http_build_url" : "1.*"
   },
   "require-dev": {
     "heroku/heroku-buildpack-php": "*"

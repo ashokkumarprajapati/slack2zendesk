@@ -19,8 +19,6 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
      error_log("This invalid request as it doesn't have correct token.");
      return 200;
   }
-   HttpResponse::status(200);
-  HttpResponse::setContentType('application/json');
   switch ($trigger_type) {
     case "@change":
       $response = "";
@@ -37,9 +35,7 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
       $data_json = json_encode($data);
       $status_code = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token,$response);
      
-      HttpResponse::setData(json_encode("{'text':'Zendesk ticket has been created for this change and sent for approval to CAB.'}"));
-      HttpResponse::send();
-      break;
+      return json_encode("{'text':'Zendesk ticket has been created for this change and sent for approval to CAB.'}");
     case "@approved":
       $response = "";
       $content = explode("@approved ",$text);
@@ -49,13 +45,11 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
       $status_code = http_request($url, $data_json, "PUT", "basic", $zd_username, $zd_api_token,$response);
       if ($status_code != "200") {
       	  //error_log("Error while trying to approve ticket in zendesk");
-          HttpResponse::setData(json_encode("{'text':'Could not create ticket in zendesk. Please check syntax. It should be like @approved <Ticket Number>}'"));
-          HttpResponse::send();
+          return json_encode("{'text':'Could not create ticket in zendesk. Please check syntax. It should be like @approved <Ticket Number>}'");
+          
 	    } 
       
-      HttpResponse::setData(json_encode("{'text':'Thanks for your approval. Zendesk Ticket#$content[1] has been approved and sent to DevOps for futher work.'}"));
-      HttpResponse::send();     
-      break;
+      return json_encode("{'text':'Thanks for your approval. Zendesk Ticket#$content[1] has been approved and sent to DevOps for futher work.'}");
     case "@ticket":
       break;
     default:
