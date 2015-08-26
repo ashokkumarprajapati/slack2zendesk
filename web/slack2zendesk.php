@@ -19,39 +19,49 @@ $slack_token = "cd9PEhQSUzJzYVjHPAYmLNSN";
      error_log("This invalid request as it doesn't have correct token.");
      return 200;
   }
+   HttpResponse::status(200);
+  HttpResponse::setContentType('application/json');
   switch ($trigger_type) {
     case "@change":
-      $verb = "triggered";
+      $response = "";
       //Remove the pd_integration tag in Zendesk to eliminate further updates
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
       $title = strstr($text,"@change");
-      //$data = array('ticket' => array( 
- 		  //             'group\_id' => 24712511,    
- 		  //             'subject' => "Change :".$text,  
- 		  //            'comment' => $text . "\n\n Created on behalf of:".$requester_name) 
- 		  //        );
+      $data = array('ticket' => array( 
+ 		              'group\_id' => 24712511,    
+ 		              'subject' => "Change :".$text,  
+ 		              'comment' => $text . "\n\n Created on behalf of:".$requester_name,
+                   'fields' => array('27504901' => "pending_approval")
+                  ) 
+ 		          );
       $data_json = json_encode($data);
-      $status_code = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
+      $status_code = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token,$response);
+     
+      HttpResponse::setData(json_encode("{'text':'Zendesk ticket has been created for this change and sent for approval to CAB.'}"));
+      HttpResponse::send();
       break;
     case "@approved":
-      $verb = "acknowledged ";
+      $response = "";
       $content = explode("@approved ",$text);
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets/$content[1].json";
       $data = array('ticket'=>array('comment'=>array('public'=>'false','body'=>"Approved by $requester_name")));
       $data_json = json_encode($data);
-      $status_code = http_request($url, $data_json, "PUT", "basic", $zd_username, $zd_api_token);
+      $status_code = http_request($url, $data_json, "PUT", "basic", $zd_username, $zd_api_token,$response);
       if ($status_code != "200") {
-          //If we did not POST correctly to Zendesk, we'll add a note to the ticket, as long as it was a triggered or acknowledged ticket.
-      	  error_log("Error while trying to approve ticket in zendesk");
-	}      
+      	  //error_log("Error while trying to approve ticket in zendesk");
+          HttpResponse::setData(json_encode("{'text':'Could not create ticket in zendesk. Please check syntax. It should be like @approved <Ticket Number>}'"));
+          HttpResponse::send();
+	    } 
+      
+      HttpResponse::setData(json_encode("{'text':'Thanks for your approval. Zendesk Ticket#$content[1] has been approved and sent to DevOps for futher work.'}"));
+      HttpResponse::send();     
       break;
     case "@ticket":
-      $verb = "resolved";
       break;
     default:
       continue 2;
   }
-function http_request($url, $data_json, $method, $auth_type, $username, $token) {
+function http_request($url, $data_json, $method, $auth_type, $username, $token,$response) {
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
   if ($auth_type == "token") {
@@ -66,7 +76,7 @@ function http_request($url, $data_json, $method, $auth_type, $username, $token) 
   curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
   curl_setopt($ch, CURLOPT_POSTFIELDS,$data_json);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_VERBOSE, true);
+  //curl_setopt($ch, CURLOPT_VERBOSE, true);
   $response  = curl_exec($ch);
   $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
   curl_close($ch);
