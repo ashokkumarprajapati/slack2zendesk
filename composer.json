@@ -1,6 +1,6 @@
 {
   "require" : {
-  	"pecl_http" : "2.2.0"
+  	"jakeasmith/http_build_url" : "1.*"
   },
   "require-dev": {
     "heroku/heroku-buildpack-php": "*"
