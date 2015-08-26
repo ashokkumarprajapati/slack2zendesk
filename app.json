@@ -24,6 +24,9 @@
     }
     "DEBUG_ENABLED": {
       "description": "Enabled Debug for this application."
+    },
+    "SLACK_CHANNEL_TOKEN": {
+      "description": "Slack Channel Token to verify."
     }
   }
 }
