@@ -1,23 +1,45 @@
 <?php
+global $slack_user_id;
 $zd_subdomain = getenv('ZENDESK_SUBDOMAIN');
 $zd_username = getenv('ZENDESK_USERNAME');
 $zd_api_token = getenv('ZENDESK_API_TOKEN');
 $debug = getenv('DEBUG_ENABLED');
 $slack_token = getenv('SLACK_CHANNEL_TOKEN');
+$slack_api_token = getenv('SLACK_API_TOKEN');
+$slack_api_userid = getenv('SLACK_API_USERID');
+
+$slack_url = "https://slack.com/api/users.list?token=$slack_api_token&user=$slack_api_userid&pretty=1";
 $channel_name = $_POST["channel_name"];
 $user_id = $_POST["user_id"];
 $requester_name = $_POST["user_name"];
 $text = $_POST["text"];
 $token = $_POST["token"];
 $trigger_type = $_POST["trigger_word"];
+$slack_user_id = $user_id;
+
 
 if ($debug == "true"){
      error_log("message recieved from slack: channel=".$channel_name ."username=".$requester_name." message=".$text);
 }
 if ($slack_token != $token){
      error_log("This invalid request as it doesn't have correct token.");
-     return 200;
+     return;
 }
+
+//Call Slack API to get email of user. This we can pass into Zendesk ticket.
+list($status_code,$response) = http_request($slack_url, "", "POST", "basic", "", "");
+if($status_code != "200"){
+    error_log("Could not get data from Slack. Please check your configurations.");
+    return;
+}
+$users = json_decode($response);
+$slack_user_array = array_filter($users->members, function($obj){
+    global $slack_user_id;
+    return $obj->name == $slack_user_id;
+});
+$slack_user_id = ""; // Reset it to prevent any future usage.
+$slack_user_email = array_values($slack_user_array)[0]->profile->email;
+
 switch ($trigger_type) {
     case "@change":
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
@@ -26,13 +48,14 @@ switch ($trigger_type) {
  		              'group_id' => 24712511,    
  		              'subject' => "Change :".$title,  
  		              'comment' => $text . "\n\n Created on behalf of:".$requester_name,
-                   'fields' => array('27504901' => "pending_approval")
+                   'fields' => array('27504901' => "pending_approval"),
+                   'requester' => array('email' => $slack_user_email)
                   ) 
  		          );
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
       $ticket_id = json_decode($response)->ticket->id;
-      $slack_response = array('text' => "Zendesk ticket#$ticket_id has been created for this change and sent for approval to CAB. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/.$ticket_id");
+      $slack_response = array('text' => "Zendesk ticket#$ticket_id has been created for this change and sent for approval to CAB. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/$ticket_id");
       echo  json_encode($slack_response);
       break;
     case "@approved":
