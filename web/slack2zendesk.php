@@ -42,6 +42,7 @@ if($status_code != "200"){
 $users = json_decode($response);
 $slack_user_array = array_filter($users->members, function($obj){
     global $slack_user_id;
+    global $requester_name;
     return $obj->name == $requester_name;
 });
 
