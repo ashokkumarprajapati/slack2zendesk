@@ -45,7 +45,7 @@ $slack_user_array = array_filter($users->members, function($obj){
 
 $slack_user_id = ""; // Reset it to prevent any future usage.
 $slack_user_email = array_values($slack_user_array)[0]->profile->email;
-
+error_log("Email of user from slack=".$slack_user_email);
 switch ($trigger_type) {
     case "@change":
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
@@ -55,12 +55,12 @@ switch ($trigger_type) {
  		              'subject' => "Change :".$title,  
  		              'comment' => $text . "\n\n Created on behalf of:".$requester_name,
                    'fields' => array("".$approval_Field_id => "pending_approval"),
-                   'requester' => array('email' => $slack_user_email)
+                   'requester' => array('email' => $slack_user_email, 'name'=>$requester_name)
                   ) 
  		          );
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
-      if ($status_code != "200") {
+      if ($status_code != "201") {
           $slack_response = array('text' => "Could not create ticket in zendesk. Please check if you have access to zendesk using same email address as in Slack.");
           echo json_encode($slack_response);
           error_log($response);
@@ -92,7 +92,7 @@ switch ($trigger_type) {
                   'group_id' => $support_Group_id,    
                   'subject' => $title,  
                   'comment' => $text . "\n\n Created on behalf of:".$requester_name),
-                  'requester' => array('email' => $slack_user_email) 
+                  'requester' => array('email' => $slack_user_email, 'name'=>$requester_name) 
               );
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
