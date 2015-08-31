@@ -45,7 +45,9 @@ $slack_user_array = array_filter($users->members, function($obj){
 
 $slack_user_id = ""; // Reset it to prevent any future usage.
 $slack_user_email = array_values($slack_user_array)[0]->profile->email;
+error_log($slack_user_array[0]);
 error_log("Email of user from slack=".$slack_user_email);
+
 switch ($trigger_type) {
     case "@change":
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
