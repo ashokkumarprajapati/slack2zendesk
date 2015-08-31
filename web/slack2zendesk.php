@@ -7,9 +7,9 @@ $debug = getenv('DEBUG_ENABLED');
 $slack_token = getenv('SLACK_CHANNEL_TOKEN');
 $slack_api_token = getenv('SLACK_API_TOKEN');
 $slack_api_userid = getenv('SLACK_API_USER_ID');
-$CAB_Group_id = = getenv('ZENDESK_CAB_GROUP_ID');
-$support_Group_id = = getenv('ZENDESK_SUPPORT_GROUP_ID');
-$approval_Field_id = = getenv('ZENDESK_APPROVAL_FIELD_ID');
+$CAB_Group_id =  getenv('ZENDESK_CAB_GROUP_ID');
+$support_Group_id  = getenv('ZENDESK_SUPPORT_GROUP_ID');
+$approval_Field_id  = getenv('ZENDESK_APPROVAL_FIELD_ID');
 
 
 $slack_url = "https://slack.com/api/users.list?token=".$slack_api_token."&user=".$slack_api_userid."&pretty=1";
@@ -33,7 +33,9 @@ if ($slack_token != $token){
 //Call Slack API to get email of user. This we can pass into Zendesk ticket.
 list($status_code,$response) = http_request($slack_url, "", "POST", "basic", "", "");
 
-error_log("response from Slack :\n" .$response);
+error_log($slack_url);
+error_log($response);
+
 if($status_code != "200"){
     error_log("Could not get data from Slack. Please check your configurations.");
     return;
