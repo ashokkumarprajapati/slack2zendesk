@@ -96,7 +96,7 @@ switch ($trigger_type) {
               );
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
-      if ($status_code != "200") {
+      if ($status_code != "201") {
           $slack_response = array('text' => "Could not create ticket in zendesk. Please check if you have access to zendesk using same email address as in Slack.");
           echo json_encode($slack_response);
           error_log($response);
