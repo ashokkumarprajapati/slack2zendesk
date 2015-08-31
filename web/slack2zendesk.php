@@ -8,7 +8,7 @@ $slack_token = getenv('SLACK_CHANNEL_TOKEN');
 $slack_api_token = getenv('SLACK_API_TOKEN');
 $slack_api_userid = getenv('SLACK_API_USERID');
 
-$slack_url = "https://slack.com/api/users.list?token=$slack_api_token&user=$slack_api_userid&pretty=1";
+$slack_url = "https://slack.com/api/users.list?token=".$slack_api_token."&user=".$slack_api_userid."&pretty=1";
 $channel_name = $_POST["channel_name"];
 $user_id = $_POST["user_id"];
 $requester_name = $_POST["user_name"];
