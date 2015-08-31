@@ -7,6 +7,10 @@ $debug = getenv('DEBUG_ENABLED');
 $slack_token = getenv('SLACK_CHANNEL_TOKEN');
 $slack_api_token = getenv('SLACK_API_TOKEN');
 $slack_api_userid = getenv('SLACK_API_USERID');
+$CAB_Group_id = = getenv('ZENDESK_CAB_GROUP_ID');
+$support_Group_id = = getenv('ZENDESK_SUPPORT_GROUP_ID');
+$approval_Field_id = = getenv('ZENDESK_APPROVAL_FIELD_ID');
+
 
 $slack_url = "https://slack.com/api/users.list?token=".$slack_api_token."&user=".$slack_api_userid."&pretty=1";
 $channel_name = $_POST["channel_name"];
@@ -47,10 +51,10 @@ switch ($trigger_type) {
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
       $title = explode("@change ",$text)[1];
       $data = array('ticket' => array( 
- 		              'group_id' => 24712511,    
+ 		              'group_id' => $CAB_Group_id,    
  		              'subject' => "Change :".$title,  
  		              'comment' => $text . "\n\n Created on behalf of:".$requester_name,
-                   'fields' => array('27504901' => "pending_approval"),
+                   'fields' => array("".$approval_Field_id => "pending_approval"),
                    'requester' => array('email' => $slack_user_email)
                   ) 
  		          );
@@ -85,7 +89,7 @@ switch ($trigger_type) {
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
       $title = explode("@change ",$text)[1];
       $data = array('ticket' => array( 
-                  'group_id' => 24294541,    
+                  'group_id' => $support_Group_id,    
                   'subject' => $title,  
                   'comment' => $text . "\n\n Created on behalf of:".$requester_name),
                   'requester' => array('email' => $slack_user_email) 
