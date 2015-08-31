@@ -94,12 +94,14 @@ switch ($trigger_type) {
     case "@ticket":
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
       $title = explode("@ticket ",$text)[1];
-      error_log("Email of user from slack=".$slack_user_email);
+      $requester = $slack_user_email;
+      error_log("Email of user from slack=".$requester);
+
       $data = array('ticket' => array( 
                   'group_id' => $support_Group_id,    
                   'subject' => $title,  
                   'comment' => $text . "\n\n Created on behalf of:".$requester_name),
-                  'requester' => array('email' => $slack_user_email, 'name'=>$requester_name) 
+                  'requester' => array('email' => $requester, 'name'=>$requester_name) 
               );
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
