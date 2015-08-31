@@ -11,9 +11,6 @@ $CAB_Group_id =  getenv('ZENDESK_CAB_GROUP_ID');
 $support_Group_id  = getenv('ZENDESK_SUPPORT_GROUP_ID');
 $approval_Field_id  = getenv('ZENDESK_APPROVAL_FIELD_ID');
 
-error_log("SLACK_API_TOKEN = ".$slack_api_token);
-error_log("SLACK_API_USER_ID".$slack_api_userid);
-error_log("ZENDESK_SUPPORT_GROUP_ID".$ZENDESK_SUPPORT_GROUP_ID);
 
 $slack_url = "https://slack.com/api/users.list?token=".$slack_api_token."&user=".$slack_api_userid."&pretty=1";
 $channel_name = $_POST["channel_name"];
@@ -36,9 +33,6 @@ if ($slack_token != $token){
 //Call Slack API to get email of user. This we can pass into Zendesk ticket.
 list($status_code,$response) = http_request($slack_url, "", "POST", "basic", "", "");
 
-error_log($slack_url);
-error_log($response);
-
 if($status_code != "200"){
     error_log("Could not get data from Slack. Please check your configurations.");
     return;
@@ -48,9 +42,9 @@ $slack_user_array = array_filter($users->members, function($obj){
     global $slack_user_id;
     return $obj->name == $slack_user_id;
 });
+
 $slack_user_id = ""; // Reset it to prevent any future usage.
 $slack_user_email = array_values($slack_user_array)[0]->profile->email;
-exit(0);
 
 switch ($trigger_type) {
     case "@change":
