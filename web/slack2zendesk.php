@@ -54,8 +54,14 @@ switch ($trigger_type) {
  		          );
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
+      if ($status_code != "200") {
+          $slack_response = array('text' => "Could not create ticket in zendesk. Please check if you have access to zendesk using same email address as in Slack.");
+          echo json_encode($slack_response);
+          error_log($response);
+          break;
+      } 
       $ticket_id = json_decode($response)->ticket->id;
-      $slack_response = array('text' => "Zendesk ticket#$ticket_id has been created for this change and sent for approval to CAB. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/$ticket_id");
+      $slack_response = array('text' => "Zendesk ticket#$ticket_id has been created for this change and sent for approval to CAB. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/".$ticket_id);
       echo  json_encode($slack_response);
       break;
     case "@approved":
@@ -79,12 +85,19 @@ switch ($trigger_type) {
       $data = array('ticket' => array( 
                   'group_id' => 24294541,    
                   'subject' => $title,  
-                  'comment' => $text . "\n\n Created on behalf of:".$requester_name) 
+                  'comment' => $text . "\n\n Created on behalf of:".$requester_name),
+                  'requester' => array('email' => $slack_user_email) 
               );
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
+      if ($status_code != "200") {
+          $slack_response = array('text' => "Could not create ticket in zendesk. Please check if you have access to zendesk using same email address as in Slack.");
+          echo json_encode($slack_response);
+          error_log($response);
+          break;
+      } 
       $ticket_id = json_decode($response)->ticket->id;
-      $slack_response = array('text' => "Zendesk ticket#.$ticket_id has been created and assigned to DevOps. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/.$ticket_id");
+      $slack_response = array('text' => "Zendesk ticket#$ticket_id has been created and assigned to DevOps. \n Link : https://$zd_subdomain.zendesk.com/agent/tickets/".$ticket_id);
       echo  json_encode($slack_response);
       break;
     default:
