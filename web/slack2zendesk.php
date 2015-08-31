@@ -54,10 +54,11 @@ error_log("Email of user from slack=".$slack_user_email);
 switch ($trigger_type) {
     case "@change":
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
+      error_log("Email of user from slack=".$slack_user_email);
       $title = explode("@change ",$text)[1];
       $data = array('ticket' => array( 
  		              'group_id' => $CAB_Group_id,    
- 		              'subject' => "Change :".$title,  
+ 		              'subject' => "Change: ".$title,  
  		              'comment' => $text . "\n\n Created on behalf of:".$requester_name,
                    'fields' => array("".$approval_Field_id => "pending_approval"),
                    'requester' => array('email' => $slack_user_email, 'name'=>$requester_name)
@@ -92,7 +93,8 @@ switch ($trigger_type) {
       break;
     case "@ticket":
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
-      $title = explode("@change ",$text)[1];
+      $title = explode("@ticket ",$text)[1];
+      error_log("Email of user from slack=".$slack_user_email);
       $data = array('ticket' => array( 
                   'group_id' => $support_Group_id,    
                   'subject' => $title,  
