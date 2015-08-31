@@ -6,7 +6,7 @@ $zd_api_token = getenv('ZENDESK_API_TOKEN');
 $debug = getenv('DEBUG_ENABLED');
 $slack_token = getenv('SLACK_CHANNEL_TOKEN');
 $slack_api_token = getenv('SLACK_API_TOKEN');
-$slack_api_userid = getenv('SLACK_API_USERID');
+$slack_api_userid = getenv('SLACK_API_USER_ID');
 $CAB_Group_id = = getenv('ZENDESK_CAB_GROUP_ID');
 $support_Group_id = = getenv('ZENDESK_SUPPORT_GROUP_ID');
 $approval_Field_id = = getenv('ZENDESK_APPROVAL_FIELD_ID');
