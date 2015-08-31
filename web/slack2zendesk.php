@@ -15,7 +15,7 @@ $approval_Field_id  = getenv('ZENDESK_APPROVAL_FIELD_ID');
 $slack_url = "https://slack.com/api/users.list?token=".$slack_api_token."&user=".$slack_api_userid."&pretty=1";
 $channel_name = $_POST["channel_name"];
 $user_id = $_POST["user_id"];
-$requester_name = $_POST["user_name"];
+global $requester_name = $_POST["user_name"];
 $text = $_POST["text"];
 $token = $_POST["token"];
 $trigger_type = $_POST["trigger_word"];
@@ -40,10 +40,10 @@ if($status_code != "200"){
 $users = json_decode($response);
 $slack_user_array = array_filter($users->members, function($obj){
     global $slack_user_id;
-    return $obj->name == $slack_user_id;
+    return $obj->name == $requester_name;
 });
 
-$slack_user_id = ""; // Reset it to prevent any future usage.
+
 $slack_user_email = array_values($slack_user_array)[0]->profile->email;
 error_log($slack_user_array[0]);
 error_log("Email of user from slack=".$slack_user_email);
@@ -132,4 +132,6 @@ function http_request($url, $data_json, $method, $auth_type, $username, $token) 
   curl_close($ch);
   return array($status_code,$response );
 }
+$slack_user_id  = ""; // Reset it to prevent any future usage.
+$requester_name = "";
 ?>
