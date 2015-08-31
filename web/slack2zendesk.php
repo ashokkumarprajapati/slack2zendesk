@@ -1,5 +1,7 @@
 <?php
 global $slack_user_id;
+global $requester_name;
+
 $zd_subdomain = getenv('ZENDESK_SUBDOMAIN');
 $zd_username = getenv('ZENDESK_USERNAME');
 $zd_api_token = getenv('ZENDESK_API_TOKEN');
@@ -15,7 +17,7 @@ $approval_Field_id  = getenv('ZENDESK_APPROVAL_FIELD_ID');
 $slack_url = "https://slack.com/api/users.list?token=".$slack_api_token."&user=".$slack_api_userid."&pretty=1";
 $channel_name = $_POST["channel_name"];
 $user_id = $_POST["user_id"];
-global $requester_name = $_POST["user_name"];
+$requester_name = $_POST["user_name"];
 $text = $_POST["text"];
 $token = $_POST["token"];
 $trigger_type = $_POST["trigger_word"];
