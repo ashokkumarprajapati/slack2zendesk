@@ -21,12 +21,27 @@
     },
     "PAGERDUTY_SUBDOMAIN": {
       "description": "The name of your PagerDuty subdomain, as it appears in the URL."
-    }
+    },
     "DEBUG_ENABLED": {
       "description": "Enabled Debug for this application."
     },
     "SLACK_CHANNEL_TOKEN": {
       "description": "Slack Channel Token to verify."
+    },
+    "SLACK_API_TOKEN": {
+      "description": "Slack API Token to get Slack User information."
+    },
+    "SLACK_API_USER_ID": {
+      "description": "Slack User to access slack API."
+    },
+    "ZENDESK_CAB_GROUP_ID": {
+      "description": "Group ID of Change Management Group in Zendesk."
+    },
+    "ZENDESK_SUPPORT_GROUP_ID": {
+      "description": "Support Group Id in Zendesk to which tickets will be assigned."
+    },
+    "ZENDESK_APPROVAL_FIELD_ID": {
+      "description": "Approval Field Id in zendesk."
     }
   }
 }
