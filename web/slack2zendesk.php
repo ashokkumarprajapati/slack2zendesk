@@ -14,7 +14,7 @@ $support_Group_id  = getenv('ZENDESK_SUPPORT_GROUP_ID');
 $approval_Field_id  = getenv('ZENDESK_APPROVAL_FIELD_ID');
 
 
-$slack_url = "https://slack.com/api/users.list?token=".$slack_api_token."&user=".$slack_api_userid."&pretty=1";
+//$slack_url = "https://slack.com/api/users.list?token=".$slack_api_token."&user=".$slack_api_userid."&pretty=1";
 $channel_name = $_POST["channel_name"];
 $user_id = $_POST["user_id"];
 $requester_name = $_POST["user_name"];
@@ -33,7 +33,7 @@ if ($slack_token != $token){
 }
 
 //Call Slack API to get email of user. This we can pass into Zendesk ticket.
-list($status_code,$response) = http_request($slack_url, "", "POST", "basic", "", "");
+/*list($status_code,$response) = http_request($slack_url, "", "POST", "basic", "", "");
 
 if($status_code != "200"){
     error_log("Could not get data from Slack. Please check your configurations.");
@@ -50,7 +50,7 @@ $slack_user_array = array_filter($users->members, function($obj){
 $slack_user_email = array_values($slack_user_array)[0]->profile->email;
 error_log($slack_user_array[0]);
 error_log("Email of user from slack=".$slack_user_email);
-
+*/
 switch ($trigger_type) {
     case "@change":
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
@@ -60,8 +60,8 @@ switch ($trigger_type) {
  		              'group_id' => $CAB_Group_id,    
  		              'subject' => "Change: ".$title,  
  		              'comment' => $text . "\n\n Created on behalf of:".$requester_name,
-                   'fields' => array("".$approval_Field_id => "pending_approval"),
-                   'requester' => array('email' => $slack_user_email, 'name'=>$requester_name)
+                   'fields' => array("".$approval_Field_id => "pending_approval")
+                   //'requester' => array('email' => $slack_user_email, 'name'=>$requester_name)
                   ) 
  		          );
       $data_json = json_encode($data);
@@ -94,14 +94,14 @@ switch ($trigger_type) {
     case "@ticket":
       $url = "https://$zd_subdomain.zendesk.com/api/v2/tickets.json";
       $title = explode("@ticket ",$text)[1];
-      $requester = $slack_user_email;
-      error_log("Email of user from slack=".$requester);
+      //$requester = $slack_user_email;
+      //error_log("Email of user from slack=".$requester);
 
       $data = array('ticket' => array( 
                   'group_id' => $support_Group_id,    
                   'subject' => $title,  
-                  'comment' => $text . "\n\n Created on behalf of:".$requester_name),
-                  'requester' => array('email' => $requester, 'name'=>$requester_name) 
+                  'comment' => $text . "\n\n Created on behalf of:".$requester_name)
+                 // 'requester' => array('email' => $requester, 'name'=>$requester_name) 
               );
       $data_json = json_encode($data);
       list($status_code,$response) = http_request($url, $data_json, "POST", "basic", $zd_username, $zd_api_token);
